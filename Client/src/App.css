@@ -1,0 +1,92 @@
+#LoginForm, #SignUpForm, #AccountPage {
+    height: 100vh;
+    background-color: #C95EEE;
+    position: relative;
+}
+
+#LoginForm::before, #SignUpForm::before {
+    content: "";
+    position: absolute;
+    max-width: 500px;
+    height: 500px;
+    border-radius: 100%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    filter: blur(200px);
+    z-index: -1;
+}
+
+#LoginForm > form, #SignUpForm > form {
+    max-width: 400px !important;
+    height: 400px;
+    border-radius: 10px;
+    background: #FDFDFD;
+    box-shadow: 0px 0px 20px 0px rgba(88, 88, 88, 0.85);
+}
+
+#AccountPage > div:first-child {
+    width: 600px !important;
+    height: 600px;
+    border-radius: 10px;
+    background: #FDFDFD;
+    box-shadow: 0px 0px 20px 0px rgba(88, 88, 88, 0.85);
+}
+
+#SignUpForm > form {
+    max-width: 500px !important;
+}
+
+#LoginForm > form img, #SignUpForm > form img {
+    width: 85px;
+}
+
+#LoginForm > form label, #SignUpForm > form label {
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.85);
+}
+
+#LoginForm > form input, #SignUpForm > form input {
+    border-radius: 7px;
+    border: 2px solid #C95EEE;
+    background: rgba(201, 94, 238, 0.06);
+    color: rgba(0, 0, 0, 0.85);
+}
+
+#LoginForm > form input:focus, #SignUpForm > form input:focus {
+    box-shadow: none;
+    background: none;
+}
+
+#LoginForm > form button, #SignUpForm > form button {
+    background-color: #C95EEE;
+    color: #FFFFFF;
+    height: fit-content;
+    font-weight: bold;
+}
+
+#LoginForm > form button:active, #SignUpForm > form button:active
+{ background-color: #ca5eeed4; }
+
+#ToSignUpPage {
+    color: #C95EEE;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#ToSignUpPage:hover {
+    text-decoration: underline;
+}
+
+#SignUpForm form > div:not(:first-of-type, :last-of-type) {
+    height: fit-content !important;
+}
+
+#SignUpForm form > div:last-of-type {
+    margin-top: 10px;
+}
+
+#NavBar ul {
+    list-style: none;
+}
