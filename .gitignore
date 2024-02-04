@@ -20,3 +20,7 @@ Client/*.ntvs*
 Client/*.njsproj
 Client/*.sln
 Client/*.sw?
+
+
+Server/node_modules
+Server/.env

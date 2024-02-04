@@ -27,7 +27,7 @@
 }
 
 #AccountPage > div:first-child {
-    width: 600px !important;
+    width: 750px !important;
     height: 600px;
     border-radius: 10px;
     background: #FDFDFD;
@@ -89,4 +89,26 @@
 
 #NavBar ul {
     list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#NavBar {
+    background-color: #faedfe;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+#NavBar ul li { width: fit-content; }
+
+#NavBar ul li:first-of-type img {
+    width: 70px;
+}
+
+#NavBar ul li:not(:first-of-type) img {
+    width: 35px;
+}
+
+#NavBar ul li:not(:first-of-type, :last-of-type) img:hover {
+    opacity: .5;
 }
