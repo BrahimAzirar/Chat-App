@@ -1,14 +1,27 @@
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const TargetForm = useRef();
+  const worker = new Worker("/src/Components/AuthWorker.js");
+  const API_URL = import.meta.env.VITE_API_URL;
+  const redirect = useNavigate();
+
+  useEffect(() => {
+    document.title = "Login Page";
+  }, []);
 
   const LoginHandler = (e) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(TargetForm.current));
-    
+    worker.postMessage({ message: "LoginToAccount", data, API_URL });
+  };
+
+  worker.onmessage = (e) => {
+    const result = e.data;
+    redirect(result);
   };
 
   return (
