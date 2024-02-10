@@ -1,5 +1,5 @@
-const { ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 
 const login = async (req, res) => {
@@ -26,8 +26,9 @@ const login = async (req, res) => {
 const signUp = async (req, res) => {
   try {
     const { db } = req.app.locals;
-    await db.collection('Members').insertOne(req.body);
-    const Token_Data = { ...req.body }; delete Token_Data.Password;
+    const member = { ...req.body, Password: await bcrypt.hash(req.body.Password, 10) };
+    await db.collection('Members').insertOne(member);
+    const Token_Data = { ...member }; delete Token_Data.Password;
     const accessToken = jwt.sign(Token_Data, process.env.JWT_KEY, { expiresIn: "10m" });
     res.cookie('auth', accessToken, {
       maxAge: 1000*60*10,

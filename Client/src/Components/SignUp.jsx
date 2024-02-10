@@ -1,13 +1,13 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useRef } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const TargetForm = useRef();
   const Com_pss = useRef();
   const API_URL = import.meta.env.VITE_API_URL;
   const worker = new Worker("/src/Components/AuthWorker.js");
-  // const redirect = useNavigate();
+  const redirect = useNavigate();
 
   useEffect(() => {
     document.title = "SignUp Page";
@@ -21,7 +21,7 @@ export default function SignUp() {
 
   worker.onmessage = (e) => {
     const result = e.data;
-    console.log(result);
+    redirect(result);
   };
 
   return (

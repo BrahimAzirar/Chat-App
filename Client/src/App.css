@@ -1,10 +1,10 @@
-#LoginForm, #SignUpForm, #AccountPage {
+#LoginForm, #SignUpForm, #AccountPage, #VerifyEmailPage {
     height: 100vh;
     background-color: #C95EEE;
     position: relative;
 }
 
-#LoginForm::before, #SignUpForm::before {
+#LoginForm::before, #SignUpForm::before, #VerifyEmailPage::before {
     content: "";
     position: absolute;
     max-width: 500px;
@@ -18,7 +18,7 @@
     z-index: -1;
 }
 
-#LoginForm > form, #SignUpForm > form {
+#LoginForm > form, #SignUpForm > form, #VerifyEmailPage > form {
     max-width: 400px !important;
     height: 400px;
     border-radius: 10px;
@@ -38,35 +38,48 @@
     max-width: 500px !important;
 }
 
+#VerifyEmailPage > form {
+    height: fit-content !important;
+}
+
 #LoginForm > form img, #SignUpForm > form img {
     width: 85px;
 }
 
-#LoginForm > form label, #SignUpForm > form label {
+#VerifyEmailPage > form img {
+    width: 75px;
+}
+
+#LoginForm > form label, #SignUpForm > form label,
+#VerifyEmailPage > form label {
     font-size: 13px;
     color: rgba(0, 0, 0, 0.85);
 }
 
-#LoginForm > form input, #SignUpForm > form input {
+#LoginForm > form input, #SignUpForm > form input,
+#VerifyEmailPage > form input {
     border-radius: 7px;
     border: 2px solid #C95EEE;
     background: rgba(201, 94, 238, 0.06);
     color: rgba(0, 0, 0, 0.85);
 }
 
-#LoginForm > form input:focus, #SignUpForm > form input:focus {
+#LoginForm > form input:focus, #SignUpForm > form input:focus,
+#VerifyEmailPage > form input:focus {
     box-shadow: none;
     background: none;
 }
 
-#LoginForm > form button, #SignUpForm > form button {
+#LoginForm > form button, #SignUpForm > form button,
+#VerifyEmailPage > form button {
     background-color: #C95EEE;
     color: #FFFFFF;
     height: fit-content;
     font-weight: bold;
 }
 
-#LoginForm > form button:active, #SignUpForm > form button:active
+#LoginForm > form button:active, #SignUpForm > form button:active,
+#VerifyEmailPage > form button:active
 { background-color: #ca5eeed4; }
 
 #ToSignUpPage {
@@ -111,4 +124,8 @@
 
 #NavBar ul li:not(:first-of-type, :last-of-type) img:hover {
     opacity: .5;
+}
+
+.HideVerificationCodeField {
+    display: none;
 }
