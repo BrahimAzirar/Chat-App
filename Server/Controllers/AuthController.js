@@ -1,5 +1,14 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+const fs = require('fs');
+const util = require('util');
+const readFileAsync = util.promisify(fs.readFile);
+const VerificationCodes = {};
+
+function generateVerificationCode() {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+};
 
 
 const login = async (req, res) => {
@@ -43,4 +52,48 @@ const signUp = async (req, res) => {
   }
 }
 
-module.exports = { login, signUp };
+const SendVerificationCode = async (req, res) => {
+  try {
+      const email = req.params.email;
+      const verificationCode = generateVerificationCode();
+      let HTML = await readFileAsync('./public/verifyEmail.html', 'utf8');
+
+      VerificationCodes[email] = verificationCode;
+      HTML = HTML.replace('{ Code }', verificationCode);
+
+      const transporter = nodemailer.createTransport({
+          service: "Gmail",
+          secure: true,
+          auth: {
+              user: process.env.MAIL_SENDER,
+              pass: process.env.MAIL_PASSWORD
+          }
+      });
+
+      await transporter.sendMail({
+          from: process.env.MAIL_SENDER,
+          to: email,
+          subject: 'Chat App email verification',
+          html: HTML
+      });
+  } catch (error) {
+    console.log(`The error from AuthController in EmailVerification(): ${error.message}`);
+    res.json({ err: "An error in the server try later !" });
+  }
+}
+
+const verfyCode = async (req, res) => {
+  try {
+    const { Email, Code } = req.body;
+    if (VerificationCodes[Email] == Code) {
+      delete VerificationCodes[Email];
+      res.status(200).json({ response: true });
+    }
+    else res.status(200).json({ err: "The verification code incorrect" });
+  } catch (error) {
+    console.log(`The error from AuthController in EmailVerification(): ${error.message}`);
+    res.json({ err: "An error in the server try later !" });
+  }
+};
+
+module.exports = { login, signUp, SendVerificationCode, verfyCode };

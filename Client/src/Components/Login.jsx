@@ -20,8 +20,13 @@ export default function Login() {
   };
 
   worker.onmessage = (e) => {
-    const result = e.data;
-    redirect(result);
+    try {
+      const { result = null, err = null } = e.data;
+      if (err) throw new Error(result.err);
+      redirect(result);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -44,6 +49,10 @@ export default function Login() {
         <div className='col-11 mx-auto text-center'>
           <span>Create a new account ?</span>
           <span> <Link to="/SignUp" id='ToSignUpPage'>Sign Up</Link> </span>
+        </div>
+        <div className='col-11 mx-auto text-center'>
+          <span>Are forgot your password ?</span>
+          <span> <Link to="/forgotPassword" id='ToForgotPasswordPage'>Forgot</Link> </span>
         </div>
       </form>
     </div>

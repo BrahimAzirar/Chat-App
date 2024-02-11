@@ -20,8 +20,13 @@ export default function SignUp() {
   };
 
   worker.onmessage = (e) => {
-    const result = e.data;
-    redirect(result);
+    try {
+      const { result = null, err = null } = e.data;
+      if (err) throw new Error(result.err);
+      redirect(result);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (

@@ -7,13 +7,13 @@ const auth = ex.Router();
 /****************** Middlewares *********************/
 
 auth.use("/verifyEmail/:email", AuthMiddleware.EmailVerification);
-auth.use("/verifyEmail/:email", AuthMiddleware.SendVerificationCode);
 
 
 /****************** APIs *********************/
 
 auth.post("/login", AuthController.login);
 auth.post("/signUp", AuthController.signUp);
-auth.get("/verifyEmail/:email");
+auth.get("/verifyEmail/:email", AuthController.SendVerificationCode);
+auth.post("/verifyCode", AuthController.verfyCode);
 
 module.exports = { auth };
