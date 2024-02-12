@@ -1,16 +1,18 @@
-import { useEffect, useRef, useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { IsNotEmpty } from "../ForAll";
 
 export default function ForgotPassword() {
+  const [EmailIsValid, setEmailIsValid] = useState(false);
+  const [CodeIsValid, setCodeIsValid] = useState(false);
   const [Index, setIndex] = useState(0);
   const [Email, SetEmail] = useState("");
   const [Code, setCode] = useState("");
-  const TargetForm = useRef();
-  const Code_verfication = useRef();
+  const [Password, setPassword] = useState("");
+  const [ComPassword, setComPassword] = useState("");
   const API_URL = import.meta.env.VITE_API_URL;
   const worker = new Worker("/src/Components/AuthWorker.js");
-  //   const redirect = useNavigate();
+  const redirect = useNavigate();
 
   useEffect(() => {
     document.title = "Email Verification Page";
@@ -43,23 +45,38 @@ export default function ForgotPassword() {
     }
   };
 
+  const updatePassword = (e) => {
+    e.preventDefault();
+    try {
+      if (Password === ComPassword) {
+        const data = { Email, Password };
+        const mess = IsNotEmpty(data, "Some feilds is empty");
+        if (mess) throw new Error(mess);
+        worker.postMessage({ message: "UpdatePassword", data, API_URL });
+      } else throw new Error("The Password not valid !");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   const TargetFunction = (e) => {
-    const functions = [SendEmail, SendVerificationCode];
+    const functions = [SendEmail, SendVerificationCode, updatePassword];
     functions[Index](e);
   };
 
   worker.onmessage = (e) => {
     try {
       const { result = null, err = null, message = null } = e.data;
-      result
       if (err) throw new Error(err);
       if (message === "Email is verified") {
-        Code_verfication.current.classList.remove("HideComponents");
+        setEmailIsValid(result);
         setIndex(1);
-      }
-      else if (message === "Code is verified") {
-        const ele = Array.form(document.getElementsByClassName("HideComponents"));
-        ele.ForEach(item => item.classList.remove("HideComponents"));
+      } else if (message === "Code is verified") {
+        setEmailIsValid(false);
+        setCodeIsValid(result);
+        setIndex(2);
+      } else if (message === "Password is updated") {
+        redirect(result);
       }
     } catch (error) {
       alert(error.message);
@@ -71,10 +88,7 @@ export default function ForgotPassword() {
       id="ForgotPasswordPage"
       className="d-flex justify-content-center align-items-center row m-0"
     >
-      <form
-        ref={TargetForm}
-        className="col-11 col-md-7 col-lg-6 p-3 px-sm-4 row"
-      >
+      <form className="col-11 col-md-7 col-lg-6 p-3 px-sm-4 row">
         <div className="d-flex justify-content-center">
           <img src="/Logo.svg" className="mb-3" />
         </div>
@@ -88,26 +102,45 @@ export default function ForgotPassword() {
             onChange={(e) => SetEmail(e.target.value)}
           />
         </div>
-        <div ref={Code_verfication} className="mb-5 HideComponents">
-          <label>Enter the verification code</label>
-          <input
-            type="text"
-            name="Code"
-            className="form-control"
-            value={Code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-        </div>
-        <div className="mb-2 HideComponents">
-          <label>Enter password</label>
-          <input type="text" name="Password" className="form-control" />
-        </div>
-        <div className="mb-5 HideComponents">
-          <label>Comfirm password</label>
-          <input type="text" className="form-control" />
-        </div>
+        {EmailIsValid && (
+          <div className="mb-5">
+            <label>Enter the verification code</label>
+            <input
+              type="text"
+              name="Code"
+              className="form-control"
+              value={Code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </div>
+        )}
+        {CodeIsValid && (
+          <>
+            <div className="mb-2">
+              <label>Enter password</label>
+              <input
+                type="password"
+                name="Password"
+                className="form-control"
+                value={Password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="mb-5">
+              <label>Comfirm password</label>
+              <input
+                type="password"
+                className="form-control"
+                value={ComPassword}
+                onChange={(e) => setComPassword(e.target.value)}
+              />
+            </div>
+          </>
+        )}
         <div>
-          <button className="btn w-100" onClick={TargetFunction}>Send</button>
+          <button className="btn w-100" onClick={TargetFunction}>
+            Send
+          </button>
         </div>
       </form>
     </div>

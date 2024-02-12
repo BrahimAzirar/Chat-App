@@ -30,8 +30,8 @@ const SignUp = async (data, apiUrl) => {
 
 const EmailIsValid = async (data, apiUrl) => {
   try {
-    const Req_Data = { credentials: 'include' };
-    const result = await (await fetch(`${apiUrl}/authMember/verifyEmail/${data.Email}`, Req_Data)).json();
+    // const Req_Data = { credentials: 'include' };
+    const result = await (await fetch(`${apiUrl}/authMember/verifyEmail/${data.Email}`)).json();
     if (result.err) throw new Error(result.err);
     return result.response;
   } catch (error) {
@@ -46,7 +46,22 @@ const CodeIsValid = async (data, apiUrl) => {
       body: JSON.stringify(data),
       headers: { "Content-Type": "application/json" },
     };
-    const result = await (await fetch(`${apiUrl}/authMember/verifyCode/`, Req_Data)).json();
+    const result = await (await fetch(`${apiUrl}/authMember/verifyCode`, Req_Data)).json();
+    if (result.err) throw new Error(result.err);
+    return result.response;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+const UpdatePassword = async (data, apiUrl) => {
+  try {
+    const Req_Data = {
+      method: "PUT", 
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" },
+    };
+    const result = await (await fetch(`${apiUrl}/authMember/UpdatePass`, Req_Data)).json();
     if (result.err) throw new Error(result.err);
     return result.response;
   } catch (error) {
@@ -73,6 +88,10 @@ self.onmessage = async (e) => {
     else if (message === "SendVerificationCode") {
       const result = await CodeIsValid(data, API_URL);
       self.postMessage({ message: "Code is verified", result });
+    }
+    else if (message === "UpdatePassword") {
+      const result = await UpdatePassword(data, API_URL);
+      self.postMessage({ message: "Password is updated", result });
     }
   } catch (error) {
     self.postMessage({ err: error.message });

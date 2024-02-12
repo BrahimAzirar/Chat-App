@@ -15,5 +15,6 @@ auth.post("/login", AuthController.login);
 auth.post("/signUp", AuthController.signUp);
 auth.get("/verifyEmail/:email", AuthController.SendVerificationCode);
 auth.post("/verifyCode", AuthController.verfyCode);
+auth.put("/UpdatePass", AuthController.UpdatePassword);
 
 module.exports = { auth };

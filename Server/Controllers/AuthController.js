@@ -77,7 +77,7 @@ const SendVerificationCode = async (req, res) => {
           html: HTML
       });
   } catch (error) {
-    console.log(`The error from AuthController in EmailVerification(): ${error.message}`);
+    console.log(`The error from AuthController in SendVerificationCode(): ${error.message}`);
     res.json({ err: "An error in the server try later !" });
   }
 }
@@ -85,15 +85,28 @@ const SendVerificationCode = async (req, res) => {
 const verfyCode = async (req, res) => {
   try {
     const { Email, Code } = req.body;
+    console.log(VerificationCodes[Email]);
     if (VerificationCodes[Email] == Code) {
       delete VerificationCodes[Email];
       res.status(200).json({ response: true });
     }
     else res.status(200).json({ err: "The verification code incorrect" });
   } catch (error) {
-    console.log(`The error from AuthController in EmailVerification(): ${error.message}`);
+    console.log(`The error from AuthController in verfyCode(): ${error.message}`);
     res.json({ err: "An error in the server try later !" });
   }
 };
 
-module.exports = { login, signUp, SendVerificationCode, verfyCode };
+const UpdatePassword = async (req, res) => {
+  try {
+    const { db } = req.app.locals;
+    const { Email, Password } = req.body;
+    await db.collection('Members').updateOne({ Email }, { $set: { Password: await bcrypt.hash(Password, 10) } });
+    res.status(200).json({ response: "/" });
+  } catch (error) {
+    console.log(`The error from AuthController in UpdatePassword(): ${error.message}`);
+    res.json({ err: "An error in the server try later !" });
+  }
+}
+
+module.exports = { login, signUp, SendVerificationCode, verfyCode, UpdatePassword };
