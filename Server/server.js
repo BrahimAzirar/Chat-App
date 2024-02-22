@@ -9,7 +9,7 @@ const app = ex();
 let db;
 
 app.use(ex.json());
-app.use(cors({ origin: process.env.ACCESS_ALLOW_ORIGIN, credentials: true }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(cookieParser());
 app.use('/authMember', auth);
 

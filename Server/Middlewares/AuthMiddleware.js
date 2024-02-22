@@ -13,4 +13,17 @@ const EmailVerification = async (req, res, next) => {
   }
 };
 
-module.exports = { EmailVerification };
+const EmailIsExist = async (req, res, next) => {
+  try {
+    const { Email } = req.body;
+    const { db } = req.app.locals;
+    const result = await db.collection('Members').findOne({ Email }, { projection: { Email: 1 } });
+    if (result) res.status(200).json({ err: "This email already exist" });
+    else next();
+  } catch (error) {
+    console.log(`The error from AuthMiddleware in EmailIsExist(): ${error.message}`);
+    res.json({ err: "An error in the server try later !" });
+  }
+}
+
+module.exports = { EmailVerification, EmailIsExist };

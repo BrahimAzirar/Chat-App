@@ -1,5 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useRef } from "react";
+import { IsNotEmpty } from '../ForAll';
 import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
@@ -15,14 +16,25 @@ export default function SignUp() {
 
   const SignUp = (e) => {
     e.preventDefault();
-    const data = { ...Object.fromEntries(new FormData(TargetForm.current)), Email_Verified: false };
-    worker.postMessage({ message: "CreateAccount", data, API_URL });
+    try {
+      const data = { ...Object.fromEntries(new FormData(TargetForm.current)), Email_Verified: false };
+      const mess = IsNotEmpty(data);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (mess) throw new Error(mess);
+      if (!emailRegex.test(data.Email))
+        throw new Error("This email not valid !");
+      if (data.Password !== Com_pss.current.value)
+        throw new Error("The password not valid !");
+      worker.postMessage({ message: "CreateAccount", data, API_URL });
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   worker.onmessage = (e) => {
     try {
       const { result = null, err = null } = e.data;
-      if (err) throw new Error(result.err);
+      if (err) throw new Error(err);
       redirect(result);
     } catch (error) {
       alert(error.message);

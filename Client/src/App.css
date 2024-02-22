@@ -1,10 +1,11 @@
-#LoginForm, #SignUpForm, #AccountPage, #ForgotPasswordPage {
+#LoginForm, #SignUpForm, #AccountPage, #ForgotPasswordPage, #verifyEmail {
     height: 100vh;
     background-color: #C95EEE;
     position: relative;
 }
 
-#LoginForm::before, #SignUpForm::before, #ForgotPasswordPage::before {
+#LoginForm::before, #SignUpForm::before, #ForgotPasswordPage::before,
+#verifyEmail::before {
     content: "";
     position: absolute;
     max-width: 500px;
@@ -18,7 +19,8 @@
     z-index: -1;
 }
 
-#LoginForm > form, #SignUpForm > form, #ForgotPasswordPage > form {
+#LoginForm > form, #SignUpForm > form, #ForgotPasswordPage > form,
+#verifyEmail > div {
     max-width: 400px !important;
     height: 400px;
     border-radius: 10px;
@@ -40,6 +42,11 @@
 
 #ForgotPasswordPage > form {
     height: fit-content !important;
+}
+
+#verifyEmail > div {
+    max-width: 450px !important;
+    height: fit-content;
 }
 
 #LoginForm > form img, #SignUpForm > form img {

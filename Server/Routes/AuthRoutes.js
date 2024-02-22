@@ -7,6 +7,7 @@ const auth = ex.Router();
 /****************** Middlewares *********************/
 
 auth.use("/verifyEmail/:email", AuthMiddleware.EmailVerification);
+auth.use("/signUp", AuthMiddleware.EmailIsExist);
 
 
 /****************** APIs *********************/
@@ -16,5 +17,6 @@ auth.post("/signUp", AuthController.signUp);
 auth.get("/verifyEmail/:email", AuthController.SendVerificationCode);
 auth.post("/verifyCode", AuthController.verfyCode);
 auth.put("/UpdatePass", AuthController.UpdatePassword);
+auth.get("/EmailIsValid/:email", AuthController.EmailIsValid);
 
 module.exports = { auth };
