@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IsNotEmpty } from "../ForAll";
+import { IsNotEmpty } from "../../ForAll";
 
 export default function ForgotPassword() {
   const [EmailIsValid, setEmailIsValid] = useState(false);
@@ -11,11 +11,11 @@ export default function ForgotPassword() {
   const [Password, setPassword] = useState("");
   const [ComPassword, setComPassword] = useState("");
   const API_URL = import.meta.env.VITE_API_URL;
-  const worker = new Worker("/src/Components/AuthWorker.js");
+  const worker = new Worker("/src/Components/Auth/AuthWorker.js");
   const redirect = useNavigate();
 
   useEffect(() => {
-    document.title = "Email Verification Page";
+    document.title = "Forget Password Page";
   }, []);
 
   const SendEmail = (e) => {

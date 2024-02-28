@@ -1,17 +1,18 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useRef } from "react";
-import { IsNotEmpty } from '../ForAll';
+import { IsNotEmpty } from '../../ForAll';
 import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const TargetForm = useRef();
   const Com_pss = useRef();
   const API_URL = import.meta.env.VITE_API_URL;
-  const worker = new Worker("/src/Components/AuthWorker.js");
+  const worker = new Worker("/src/Components/Auth/AuthWorker.js");
   const redirect = useNavigate();
 
   useEffect(() => {
     document.title = "SignUp Page";
+    worker.postMessage({ message: "IsAuth", API_URL });
   }, []);
 
   const SignUp = (e) => {
@@ -33,9 +34,14 @@ export default function SignUp() {
 
   worker.onmessage = (e) => {
     try {
-      const { result = null, err = null } = e.data;
+      const { message = null, result = null, err = null } = e.data;
       if (err) throw new Error(err);
-      redirect(result);
+      if (message === "it's created") {
+        redirect(result);
+      }
+      else if (message === "Is authenticated") {
+        if (result) redirect('/Account');
+      }
     } catch (error) {
       alert(error.message);
     }

@@ -2,28 +2,44 @@ import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IsNotEmpty } from '../../ForAll';
 
 export default function Login() {
   const TargetForm = useRef();
-  const worker = new Worker("/src/Components/AuthWorker.js");
+  const worker = new Worker("/src/Components/Auth/AuthWorker.js");
   const API_URL = import.meta.env.VITE_API_URL;
   const redirect = useNavigate();
 
   useEffect(() => {
     document.title = "Login Page";
+    worker.postMessage({ message: "IsAuth", API_URL });
   }, []);
 
   const LoginHandler = (e) => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(TargetForm.current));
-    worker.postMessage({ message: "LoginToAccount", data, API_URL });
+    try {
+      const data = Object.fromEntries(new FormData(TargetForm.current));
+      const mess = IsNotEmpty(data);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (mess) throw new Error(mess);
+      if (!emailRegex.test(data.Email))
+        throw new Error("This email not valid !");
+      worker.postMessage({ message: "LoginToAccount", data, API_URL });
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   worker.onmessage = (e) => {
     try {
-      const { result = null, err = null } = e.data;
+      const { message = null, result = null, err = null } = e.data;
       if (err) throw new Error(err);
-      redirect(result);
+      if (message === "ToAccount") {
+        redirect(result);
+      }
+      else if (message === "Is authenticated") {
+        if (result) redirect('/Account');
+      }
     } catch (error) {
       alert(error.message);
     }

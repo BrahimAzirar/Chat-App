@@ -30,7 +30,6 @@ const SignUp = async (data, apiUrl) => {
 
 const EmailIsValid = async (data, apiUrl) => {
   try {
-    // const Req_Data = { credentials: 'include' };
     const result = await (await fetch(`${apiUrl}/authMember/verifyEmail/${data.Email}`)).json();
     if (result.err) throw new Error(result.err);
     return result.response;
@@ -67,19 +66,30 @@ const UpdatePassword = async (data, apiUrl) => {
   } catch (error) {
     throw new Error(error.message);
   }
+};
+
+const IsAuth = async (apiUrl) => {
+  try {
+    const Req_Data = { credentials: 'include' };
+    const result = await (await fetch(`${apiUrl}/authMember/isAuth`, Req_Data)).json();
+    if (result.err) throw new Error(result.err);
+    return result.response;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
 
 self.onmessage = async (e) => {
-  const { message, data, API_URL } = e.data;
+  const { message, data = null, API_URL } = e.data;
 
   try {
     if (message === "LoginToAccount") {
       const result = await Login(data, API_URL);
-      self.postMessage({ result });
+      self.postMessage({ message: "ToAccount", result });
     }
     else if (message === "CreateAccount") {
       const result = await SignUp(data, API_URL);
-      self.postMessage({ result });
+      self.postMessage({ message: "it's created", result });
     }
     else if (message === "VerifyEmail") {
       const result = await EmailIsValid(data, API_URL);
@@ -92,6 +102,10 @@ self.onmessage = async (e) => {
     else if (message === "UpdatePassword") {
       const result = await UpdatePassword(data, API_URL);
       self.postMessage({ message: "Password is updated", result });
+    }
+    else if (message === "IsAuth") {
+      const result = await IsAuth(API_URL);
+      self.postMessage({ message: "Is authenticated", result });
     }
   } catch (error) {
     self.postMessage({ err: error.message });

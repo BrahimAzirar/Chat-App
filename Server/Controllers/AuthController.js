@@ -33,8 +33,10 @@ const login = async (req, res) => {
   try {
     const { db } = req.app.locals;
     const { Email, Password } = req.body;
-    const member = await db.collection('Members').findOne({ Email, Password }, { projection: { Password: 0 } });
-    if (member !== null) {
+    const member = await db.collection('Members').findOne({ Email });
+    const validPss = await bcrypt.compare(Password, member.Password);
+    if (member !== null && validPss) {
+      delete member.Password;
       const accessToken = jwt.sign(member, process.env.JWT_KEY, { expiresIn: "10m" });
       res.cookie('auth', accessToken, {
         maxAge: 1000*60*10,
@@ -128,6 +130,29 @@ const EmailIsValid = async (req, res) => {
     console.log(`The error from AuthController in EmailIsValid(): ${error.message}`);
     res.json({ err: "An error in the server try later !" });
   }
-}
+};
 
-module.exports = { login, signUp, SendVerificationCode, verfyCode, UpdatePassword, EmailIsValid };
+const IsAuth = async (req, res) => {
+  try {
+    const { auth = false } = req.cookies;
+    
+    if (auth) {
+      const jwtIsValid = await jwt.verify(auth, process.env.JWT_KEY);
+      return res
+        .status(200)
+        .json({
+          response:
+            typeof jwtIsValid === "object" &&
+            jwtIsValid !== null &&
+            !Array.isArray(jwtIsValid),
+        });
+    };
+
+    return res.status(200).json({ response: false });
+  } catch (error) {
+    console.log(`The error from AuthController in IsAuth(): ${error.message}`);
+    res.json({ err: "An error in the server try later !" });
+  }
+};
+
+module.exports = { login, signUp, SendVerificationCode, verfyCode, UpdatePassword, EmailIsValid, IsAuth };
