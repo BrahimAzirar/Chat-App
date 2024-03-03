@@ -3,6 +3,7 @@ const FriendsRequestsController = require("../Controllers/FriendsRequestsControl
 
 const FriendsRequests = ex.Router();
 
-FriendsRequests.post("/sendFriendRequest", FriendsRequestsController.SendFriendRequest);
+FriendsRequests.get("/sendFriendRequest/:TargetMember", FriendsRequestsController.SendFriendRequest);
+FriendsRequests.get("/seeFriendsRequests", FriendsRequestsController.SeeFriendsRequests);
 
 module.exports = { FriendsRequests };
