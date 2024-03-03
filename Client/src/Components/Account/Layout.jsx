@@ -5,7 +5,7 @@ export default function NavBar() {
     <div id="NavBar" className="col-2 h-100">
       <ul className="pt-3 d-flex flex-column align-items-center">
         <li className="mb-5">
-          <Link to="/Account">
+          <Link to="/Account/friends">
             <img src="/Logo.svg" />
           </Link>
         </li>

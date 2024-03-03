@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { ObjectId } = require("mongodb");
 const nodemailer = require("nodemailer");
 const fs = require('fs');
 const util = require('util');
@@ -39,12 +40,12 @@ const login = async (req, res) => {
       delete member.Password;
       const accessToken = jwt.sign(member, process.env.JWT_KEY, { expiresIn: "10m" });
       res.cookie('auth', accessToken, {
-        maxAge: 1000*60*10,
+        maxAge: 1000*60*60*24*7,
         httpOnly: true,
         path: '/',
         secure: false
       });
-      res.status(200).json({ response: '/Account' });
+      res.status(200).json({ response: '/Account/friends' });
     } else res.status(200).json({ err: "The email or password incorrect !" });
   } catch (error) {
     console.log(`The error from AuthController in login(): ${error.message}`);
@@ -55,26 +56,44 @@ const login = async (req, res) => {
 const signUp = async (req, res) => {
   try {
     const { db } = req.app.locals;
-    let HTML = await readFileAsync('./public/verifyEmail.html', 'utf8');
-    const member = { ...req.body, Password: await bcrypt.hash(req.body.Password, 10) };
-    await db.collection('Members').insertOne(member);
-    const Token_Data = { ...member }; delete Token_Data.Password;
-    const accessToken = jwt.sign(Token_Data, process.env.JWT_KEY, { expiresIn: "10m" });
-
-    HTML = HTML.replace("{{ TO }}", `${process.env.SERVER_URL}/authMember/EmailIsValid/${member.Email}`);
-
-    res.cookie('auth', accessToken, {
-      maxAge: 1000*60*10,
-      httpOnly: true,
-      path: '/',
-      secure: false
+    let HTML = await readFileAsync("./public/verifyEmail.html", "utf8");
+    const member = {
+      ...req.body,
+      Password: await bcrypt.hash(req.body.Password, 10),
+    };
+    const _id = await db
+      .collection("Members")
+      .insertOne({
+        member,
+        FriendsRequests: [],
+        Friends: [],
+        BlockedFriends: [],
+        Chat: [],
+        Notifications: [],
+      });
+      const Token_Data = { _id: _id.insertedId.toJSON(), ...member };
+      delete Token_Data.Password;
+    const accessToken = jwt.sign(Token_Data, process.env.JWT_KEY, {
+      expiresIn: "10m",
     });
 
-    SendToEmailBox(HTML, member.Email, 'Verify your email');
-    res.status(200).json({ response: '/verifyEmail' });
+    HTML = HTML.replace(
+      "{{ TO }}",
+      `${process.env.SERVER_URL}/authMember/EmailIsValid/${member.Email}`
+    );
+
+    res.cookie("auth", accessToken, {
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: true,
+      path: "/",
+      secure: false,
+    });
+
+    SendToEmailBox(HTML, member.Email, "Verify your email");
+    res.status(200).json({ response: "/verifyEmail" });
   } catch (error) {
     console.log(`The error from AuthController in signUp(): ${error.message}`);
-    res.json({ err: 'An error in the server try later !' });
+    res.json({ err: "An error in the server try later !" });
   }
 };
 
@@ -125,7 +144,7 @@ const EmailIsValid = async (req, res) => {
     const { db } = req.app.locals;
     const Email = req.params.email;
     await db.collection('Members').updateOne({ Email }, { $set: { Email_Verified: true } });
-    res.redirect(`${process.env.CLIENT_URL}/Account`);
+    res.redirect(`${process.env.CLIENT_URL}/Account/friends`);
   } catch (error) {
     console.log(`The error from AuthController in EmailIsValid(): ${error.message}`);
     res.json({ err: "An error in the server try later !" });

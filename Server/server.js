@@ -1,6 +1,8 @@
 const ex = require('express');
 const { MongoClient } = require('mongodb');
 const { auth } = require('./Routes/AuthRoutes');
+const { members } = require("./Routes/MembersRoutes");
+const { FriendsRequests } = require("./Routes/FriendsRequestsRoutes");
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
 require('dotenv').config();
@@ -12,6 +14,8 @@ app.use(ex.json());
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(cookieParser());
 app.use('/authMember', auth);
+app.use('/members', members);
+app.use('/friendsRequests', FriendsRequests);
 
 MongoClient.connect(process.env.MONGO_URL)
     .then(client => {
