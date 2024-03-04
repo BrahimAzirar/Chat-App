@@ -20,6 +20,7 @@ app.use('/friendsRequests', FriendsRequests);
 MongoClient.connect(process.env.MONGO_URL)
     .then(client => {
         db = client.db('ChatDB');
+        app.locals.client = client;
         app.locals.db = db;
 
         console.log("Connected with mongodb :)");

@@ -136,3 +136,29 @@
 .HideComponents {
     display: none;
 }
+
+#Account-Content > div:first-of-type {
+    width: 60%;
+    padding: 7px;
+    margin: 12px auto 0 auto;
+    display: flex;
+    align-items: center;
+    border: 2px solid #C95EEE;
+    border-radius: 7px;
+}
+
+#Account-Content > div:first-of-type input {
+    border: none;
+    width: 100%;
+    height: 100%;
+    color: #C95EEE;
+    text-indent: 5px;
+}
+
+#Account-Content > div:first-of-type input:focus {
+    outline: none;
+}
+
+#Account-Content > div:first-of-type input::placeholder {
+    color: #C95EEE;
+}

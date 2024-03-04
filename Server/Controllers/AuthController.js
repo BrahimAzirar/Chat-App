@@ -34,22 +34,29 @@ const login = async (req, res) => {
   try {
     const { db } = req.app.locals;
     const { Email, Password } = req.body;
-    const member = await db.collection('Members').findOne({ Email });
+    const member = await db
+      .collection("Members")
+      .findOne(
+        { Email },
+        { _id: 1, Profile: 1, FirstName: 1, LastName: 1, Email: 1 }
+      );
     const validPss = await bcrypt.compare(Password, member.Password);
     if (member !== null && validPss) {
       delete member.Password;
-      const accessToken = jwt.sign(member, process.env.JWT_KEY, { expiresIn: "10m" });
-      res.cookie('auth', accessToken, {
-        maxAge: 1000*60*60*24*7,
-        httpOnly: true,
-        path: '/',
-        secure: false
+      const accessToken = jwt.sign(member, process.env.JWT_KEY, {
+        expiresIn: "10m",
       });
-      res.status(200).json({ response: '/Account/friends' });
+      res.cookie("auth", accessToken, {
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+        httpOnly: true,
+        path: "/",
+        secure: false,
+      });
+      res.status(200).json({ response: "/Account/friends" });
     } else res.status(200).json({ err: "The email or password incorrect !" });
   } catch (error) {
     console.log(`The error from AuthController in login(): ${error.message}`);
-    res.json({ err: 'An error in the server try later !' });
+    res.json({ err: "An error in the server try later !" });
   }
 };
 
@@ -170,7 +177,6 @@ const IsAuth = async (req, res) => {
     return res.status(200).json({ response: false });
   } catch (error) {
     console.log(`The error from AuthController in IsAuth(): ${error.message}`);
-    res.json({ err: "An error in the server try later !" });
   }
 };
 
