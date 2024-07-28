@@ -10,7 +10,7 @@ export default function NavBar() {
           </Link>
         </li>
         <li className="mb-5">
-          <Link to="/Account">
+          <Link to="/Account/friends">
             <img src="/user-regular 1.svg" />
           </Link>
         </li>

@@ -40,7 +40,7 @@ export default function SignUp() {
         redirect(result);
       }
       else if (message === "Is authenticated") {
-        if (result) redirect('/Account');
+        if (result) redirect('/Account/friends');
       }
     } catch (error) {
       alert(error.message);
