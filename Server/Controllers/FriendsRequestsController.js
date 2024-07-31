@@ -3,26 +3,26 @@ const jwt = require("jsonwebtoken");
 
 const SendFriendRequest = async (req, res) => {
   try {
-      const { db } = req.app.locals;
-      const TargetMember = req.params.TargetMember;
-      const MemberId = await jwt.verify(req.cookies.auth, process.env.JWT_KEY)._id;
+    const { db } = req.app.locals;
+    const TargetMember = req.params.TargetMember;
+    const MemberId = await jwt.verify(req.cookies.auth, process.env.JWT_KEY)._id;
 
-      const targetMember = new ObjectId(TargetMember);
-      const memberId = new ObjectId(MemberId);
+    const targetMember = new ObjectId(TargetMember);
+    const memberId = new ObjectId(MemberId);
 
-      await db.collection("Members").updateOne(
-          { _id: targetMember },
-          { $push: { FriendsRequests: memberId } }
-      );
+    await db.collection("Members").updateOne(
+      { _id: targetMember },
+      { $push: { FriendsRequests: memberId } }
+    );
 
-      res.status(200).json({ response: true });
+    res.status(200).json({ response: true });
   } catch (error) {
-      console.log(
-          `The error from FriendsRequestsController in SendFriendRequest(): ${error.message}`
-      );
-      res.json({
-          err: "An error occurred on the server. Please try again later.",
-      });
+    console.log(
+      `The error from FriendsRequestsController in SendFriendRequest(): ${error.message}`
+    );
+    res.json({
+      err: "An error occurred on the server. Please try again later.",
+    });
   }
 };
 
@@ -32,10 +32,34 @@ const SeeFriendsRequests = async (req, res) => {
     const MemberId = new ObjectId((await jwt.verify(req.cookies.auth, process.env.JWT_KEY))._id);
 
     const friendsRequests = await db.collection("Members").aggregate([
-      { $match: { _id: MemberId } },
-      { $lookup: { from: "Members", localField: "FriendsRequests", foreignField: "_id", as: "friends" } },
-      { $unwind: "$friends" },
-      { $project: { "friends._id": 1, "friends.Profile": { $ifNull: ["$friends.Profile", null] }, "friends.FirstName": 1, "friends.LastName": 1 } }
+      {
+        $match: { _id: MemberId }
+      },
+      {
+        $lookup: {
+          from: 'Members',
+          localField: 'FriendsRequests',
+          foreignField: '_id',
+          as: 'friendRequestsInfo'
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          friendRequestsInfo: {
+            _id: 1,
+            FirstName: 1,
+            LastName: 1,
+            Photo: 1
+          }
+        }
+      },
+      {
+        $unwind: '$friendRequestsInfo'
+      },
+      {
+        $replaceRoot: { newRoot: '$friendRequestsInfo' }
+      }
     ]).toArray();
 
     res.status(200).json({ response: friendsRequests });
@@ -55,7 +79,7 @@ const AcceptFriendRequest = async (req, res) => {
     session.startTransaction();
 
     await db.collection("Members").updateOne({ _id: MemberId }, { $push: { Friends: TargetMember } });
-    await db.collection("Members").updateOne({ _id: MemberId }, { $pull: { FriendsRequests: TargetMember } }); 
+    await db.collection("Members").updateOne({ _id: MemberId }, { $pull: { FriendsRequests: TargetMember } });
 
     await session.commitTransaction();
     res.status(200).json({ response: true });
@@ -73,7 +97,7 @@ const CancelFriendRequest = async (req, res) => {
     const MemberId = new ObjectId((await jwt.verify(req.cookies.auth, process.env.JWT_KEY))._id);
 
     await db.collection("Members").updateOne({ _id: MemberId }, { $pull: { FriendsRequests: TargetMember } });
-    
+
     res.status(200).json({ response: true });
   } catch (error) {
     console.log(`The error from FriendsRequestsController in CancelFriendRequest(): ${error.message}`);

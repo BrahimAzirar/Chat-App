@@ -4,21 +4,6 @@
     position: relative;
 }
 
-#LoginForm::before, #SignUpForm::before, #ForgotPasswordPage::before,
-#verifyEmail::before {
-    content: "";
-    position: absolute;
-    max-width: 500px;
-    height: 500px;
-    border-radius: 100%;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    filter: blur(200px);
-    z-index: -1;
-}
-
 #LoginForm > form, #SignUpForm > form, #ForgotPasswordPage > form,
 #verifyEmail > div {
     max-width: 400px !important;
@@ -161,4 +146,78 @@
 
 #Account-Content > div:first-of-type input::placeholder {
     color: #C95EEE;
+}
+
+#Members9832X {
+    width: 80% !important;
+    height: 87% !important;
+    overflow-x: hidden;
+}
+
+#Members9832X::-webkit-scrollbar {
+    display: none;
+}
+
+.Members-Label {
+    font-size: 15px;
+    font-weight: bold;
+    text-indent: 75px;
+    position: relative;
+}
+
+.Members-Label::after, .Members-Label::before {
+    content: "";
+    position: absolute;
+    height: 2px;
+    border-radius: 5px;
+    top: 50%;
+}
+
+.Members-Label.FR_Content::after {
+    right: 0;
+    width: 58%;
+    background-color: rgba(201, 94, 238, 0.8);
+}
+
+.Members-Label.FR_Content::before {
+    background-color: rgba(201, 94, 238, 0.8);
+    left: 0;
+    width: 12%;
+}
+
+.Members-Label.M_Content::after {
+    right: 0;
+    width: 66%;
+    background-color: black;
+}
+
+.Members-Label.M_Content::before {
+    background-color: black;
+    left: 0;
+    width: 12%;
+}
+
+#Members9832X > div:first-of-type::after,
+#Members9832X > div:last-of-type::after {
+    content: "";
+    position: absolute;
+    height: 2px;
+    border-radius: 5px;
+    width: 100%;
+    bottom: 0;
+    background-color: rgba(201, 94, 238, 0.8);
+}
+
+.MembersCards {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(201, 94, 238, 0.1);
+    border-radius: 5px;
+}
+
+.MembersCards > div:first-of-type p {
+    font-size: 15px;
+    font-weight: bold;
+    margin-left: 10px !important;
 }

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { ObjectId } = require("mongodb");
+// const { ObjectId } = require("mongodb");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const util = require("util");
@@ -39,10 +39,10 @@ const login = async (req, res) => {
       if (validPss) {
         delete member.Password;
         const accessToken = jwt.sign(member, process.env.JWT_KEY, {
-          expiresIn: "1m",
+          expiresIn: "10m",
         });
         res.cookie("auth", accessToken, {
-          maxAge: 1000 * 60,
+          maxAge: 1000 * 60 * 10,
           httpOnly: true,
           path: "/",
           secure: false,
@@ -72,7 +72,7 @@ const signUp = async (req, res) => {
     await db.collection("Members").insertOne(member);
     delete member.Password;
     const accessToken = jwt.sign(member, process.env.JWT_KEY, {
-      expiresIn: "1m",
+      expiresIn: "10m",
     });
 
     HTML = HTML.replace(
@@ -148,7 +148,7 @@ const EmailIsValid = async (req, res) => {
       .collection("Members")
       .updateOne({ Email }, { $set: { Email_Verified: true } });
     res.cookie("auth", req.params.token, {
-      maxAge: 1000 * 60,
+      maxAge: 1000 * 60 * 10,
       httpOnly: true,
       path: "/",
       secure: false,

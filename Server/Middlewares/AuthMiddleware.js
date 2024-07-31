@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+
 const EmailVerification = async (req, res, next) => {
   try {
     const Email = req.params.email;
@@ -26,4 +28,20 @@ const EmailIsExist = async (req, res, next) => {
   }
 }
 
-module.exports = { EmailVerification, EmailIsExist };
+const HaveTheAccess = async (req, res, next) => {
+  try {
+    const { auth = false } = req.cookies;
+
+    if (auth) {
+      const token = await jwt.verify(auth, process.env.JWT_KEY);
+      
+      if (token) next();
+      else res.status(200).json({ response: "The session expired :(" });
+    } else res.status(200).json({ response: "The session expired :(" });
+
+  } catch (error) {
+    console.log(`The error from AuthMiddleware in HaveTheAccess(): ${error.message}`);
+  }
+}
+
+module.exports = { EmailVerification, EmailIsExist, HaveTheAccess };

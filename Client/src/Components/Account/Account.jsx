@@ -30,7 +30,7 @@ export default function Account({ com }) {
     <div id="AccountPage" className="d-flex justify-content-center align-items-center">
       <div className="row">
         <NavBar />
-        <div className="col-10 py-3" id="Account-Content"> { com } </div>
+        <div className="col-10 py-3 h-100" id="Account-Content"> { com } </div>
       </div>
     </div>
   );
