@@ -15,7 +15,7 @@ const SendFriendRequest = async (req, res) => {
       { $push: { FriendsRequests: memberId } }
     );
 
-    res.status(200).json({ response: true });
+    res.status(200).json({ response: TargetMember });
   } catch (error) {
     console.log(
       `The error from FriendsRequestsController in SendFriendRequest(): ${error.message}`
@@ -79,6 +79,7 @@ const AcceptFriendRequest = async (req, res) => {
     session.startTransaction();
 
     await db.collection("Members").updateOne({ _id: MemberId }, { $push: { Friends: TargetMember } });
+    await db.collection("Members").updateOne({ _id: TargetMember }, { $push: { Friends: MemberId } });
     await db.collection("Members").updateOne({ _id: MemberId }, { $pull: { FriendsRequests: TargetMember } });
 
     await session.commitTransaction();
@@ -98,7 +99,7 @@ const CancelFriendRequest = async (req, res) => {
 
     await db.collection("Members").updateOne({ _id: MemberId }, { $pull: { FriendsRequests: TargetMember } });
 
-    res.status(200).json({ response: true });
+    res.status(200).json({ response: TargetMember });
   } catch (error) {
     console.log(`The error from FriendsRequestsController in CancelFriendRequest(): ${error.message}`);
     res.status(500).json({ err: "An error occurred on the server. Please try again later." });

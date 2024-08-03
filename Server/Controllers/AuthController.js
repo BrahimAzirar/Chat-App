@@ -33,7 +33,16 @@ const login = async (req, res) => {
   try {
     const { db } = req.app.locals;
     const { Email, Password } = req.body;
-    const member = await db.collection("Members").findOne({ Email });
+    const member = await db.collection("Members").findOne({ Email }, {
+      projection: {
+        _id: 1,
+        FirstName: 1,
+        LastName: 1,
+        Email: 1,
+        Email_Verified: 1,
+        Password: 1
+      }
+    });
     if (member !== null) {
       const validPss = await bcrypt.compare(Password, member.Password);
       if (validPss) {
@@ -69,9 +78,9 @@ const signUp = async (req, res) => {
       Chat: [],
       Notifications: []
     };
-    await db.collection("Members").insertOne(member);
-    delete member.Password;
-    const accessToken = jwt.sign(member, process.env.JWT_KEY, {
+    const result = await db.collection("Members").insertOne(member);
+    delete req.body.Password;
+    const accessToken = jwt.sign({ _id: result.insertedId, ...req.body }, process.env.JWT_KEY, {
       expiresIn: "10m",
     });
 
@@ -143,11 +152,16 @@ const UpdatePassword = async (req, res) => {
 const EmailIsValid = async (req, res) => {
   try {
     const { db } = req.app.locals;
-    const { Email } = await jwt.verify(req.params.token, process.env.JWT_KEY);
+    const data = await jwt.verify(req.params.token, process.env.JWT_KEY);
+
     await db
       .collection("Members")
-      .updateOne({ Email }, { $set: { Email_Verified: true } });
-    res.cookie("auth", req.params.token, {
+      .updateOne({ Email: data.Email }, { $set: { Email_Verified: true } });
+
+    data.Email_Verified = true;
+    const token = await jwt.sign(data, process.env.JWT_KEY);
+
+    res.cookie("auth", token, {
       maxAge: 1000 * 60 * 10,
       httpOnly: true,
       path: "/",

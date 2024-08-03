@@ -9,23 +9,48 @@ const getMembers = async (req, res) => {
     const membersPerPage = 10;
     const pageNumber = parseInt(req.query.page) || 1;
     const memberSkip = (pageNumber - 1) * membersPerPage;
-    const { _id, FriendsRequests } = await jwt.verify(auth, process.env.JWT_KEY);
+    const { _id } = await jwt.verify(auth, process.env.JWT_KEY);
 
-    const members = await db.collection('Members')
-      .find({ $and: [
-        { _id: { $ne: new ObjectId(_id) } },
-        { _id: { $nin: FriendsRequests.map(ele => new ObjectId(ele)) } }
-      ] }, {
-        projection: {
-          FirstName: 1,
-          LastName: 1,
-          Photo: 1,
-          _id: 1
+    // Use aggregation pipeline to filter members in one query
+    const members = await db.collection('Members').aggregate([
+      { $match: { _id: new ObjectId(_id) } }, // Find the current user
+      { $project: { FriendsRequests: 1, Friends: 1 } }, // Project only FriendsRequests and Friends
+      {
+        $lookup: {
+          from: 'Members',
+          let: { friendsRequests: '$FriendsRequests', friends: '$Friends' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $ne: ['$_id', new ObjectId(_id)] },
+                    { $not: [{ $in: ['$_id', '$$friendsRequests'] }] }
+                  ]
+                }
+              }
+            },
+            { $skip: memberSkip },
+            { $limit: membersPerPage },
+            { $project: { FirstName: 1, LastName: 1, Photo: 1, FriendsRequests: 1, Friends: 1 } }
+          ],
+          as: 'members'
         }
-      })
-      .skip(memberSkip)
-      .limit(membersPerPage)
-      .toArray();
+      },
+      { $unwind: '$members' }, // Unwind the members array
+      { $replaceRoot: { newRoot: '$members' } }, // Replace the root with members documents
+      {
+        $addFields: {
+          SentFriendRequest: {
+            $in: [new ObjectId(_id), '$FriendsRequests']
+          },
+          Friends: {
+            $in: [new ObjectId(_id), '$Friends']
+          }
+        }
+      },
+      { $project: { FriendsRequests: 0 } } // Remove FriendsRequests from the result
+    ]).toArray();
 
     res.status(200).json({ response: members });
   } catch (error) {
@@ -34,6 +59,36 @@ const getMembers = async (req, res) => {
   }
 };
 
+const SearchMembers = async (req, res) => {
+  try {
+    const { db } = req.app.locals;
+    const { search, page = 1 } = req.query;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    
+    const result = await db.collection("Members").find({
+      $or: [
+        { FirstName: { $regex: search, $options: 'i' } },
+        { LastName: { $regex: search, $options: 'i' } } 
+      ]
+    }, {
+      projection: {
+        _id: 1,
+        FirstName: 1,
+        LastName: 1,
+        Photo: 1
+      }
+    })
+      .limit(limit)
+      .skip(skip)
+      .toArray();
+
+    res.status(200).json({ response: result });
+  } catch (error) {
+    console.log(`The error from MembersController in SearchMembers(): ${error.message}`);
+    res.json({ err: "An error occurred on the server. Please try again later." });
+  }
+}
 
 const addMembers = async (req, res) => {
   try {
@@ -57,10 +112,10 @@ const addMembers = async (req, res) => {
       const Email_Verified = false;
 
       data.push({
-        FirstName, 
-        LastName, 
-        Email, 
-        Password, 
+        FirstName,
+        LastName,
+        Email,
+        Password,
         Email_Verified,
         FriendsRequests: [],
         Friends: [],
@@ -78,4 +133,4 @@ const addMembers = async (req, res) => {
   }
 }
 
-module.exports = { getMembers, addMembers };
+module.exports = { getMembers, addMembers, SearchMembers };

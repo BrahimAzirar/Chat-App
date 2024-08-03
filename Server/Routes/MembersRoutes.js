@@ -11,6 +11,7 @@ members.use(AuthMiddlewares.HaveTheAccess);
 ////////////////// APIs //////////////////
 
 members.get('/getMembers', MembersController.getMembers);
-/* members.get('/addMembers', MembersController.addMembers); */
+members.get('/SearchMembers', MembersController.SearchMembers);
+// members.get('/addMembers', MembersController.addMembers);
 
 module.exports = { members };

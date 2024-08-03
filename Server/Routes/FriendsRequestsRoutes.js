@@ -1,12 +1,14 @@
 const ex = require("express");
 const FriendsRequestsController = require("../Controllers/FriendsRequestsController");
 const AuthMiddlewares = require("../Middlewares/AuthMiddleware");
+const FriendRequestsMiddleware = require("../Middlewares/FriendRequestsMiddleware");
 
 const FriendsRequests = ex.Router();
 
 ///////////////// Middlewares /////////////////
 
 FriendsRequests.use(AuthMiddlewares.HaveTheAccess);
+FriendsRequests.use("/sendFriendRequest/:TargetMember", FriendRequestsMiddleware.FriendRequestIsExist);
 
 ///////////////// APIs /////////////////
 

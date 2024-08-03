@@ -208,6 +208,10 @@
     background-color: rgba(201, 94, 238, 0.8);
 }
 
+#Members9832X > div:last-of-type::after {
+    background-color: black;
+}
+
 .MembersCards {
     display: flex;
     justify-content: space-between;
